@@ -929,15 +929,14 @@ WebChat is built on the shoulders of giants. Special thanks to:
 
 ---
 
-## 📈 SEO Keywords
 
-**Primary Keywords:** self-hosted chat platform, open source Discord alternative, real-time messaging platform, gaming chat software, WebSocket chat application, Rust chat server, privacy-focused communication, self-hosted team chat
+self-hosted chat platform, open source Discord alternative, real-time messaging platform, gaming chat software, WebSocket chat application, Rust chat server, privacy-focused communication, self-hosted team chat
 
-**Long-Tail Keywords:** best self-hosted Discord alternative 2026, how to self-host chat server, open source gaming communication platform, Discord replacement for privacy, Rust WebSocket real-time chat, scalable self-hosted messaging, enterprise Discord alternative, free self-hosted chat solution, Discord clone open source, gaming community chat platform
+best self-hosted Discord alternative 2026, how to self-host chat server, open source gaming communication platform, Discord replacement for privacy, Rust WebSocket real-time chat, scalable self-hosted messaging, enterprise Discord alternative, free self-hosted chat solution, Discord clone open source, gaming community chat platform
 
-**Technical Keywords:** Rust Tokio WebSocket, Next.js 14 chat application, MongoDB real-time messaging, Redis pub/sub chat, Axum web framework, LiveKit voice chat integration, Docker Compose chat deployment, Kubernetes chat platform, end-to-end encrypted messaging, JWT authentication Rust
+**Technical:** Rust Tokio WebSocket, Next.js 14 chat application, MongoDB real-time messaging, Redis pub/sub chat, Axum web framework, LiveKit voice chat integration, Docker Compose chat deployment, Kubernetes chat platform, end-to-end encrypted messaging, JWT authentication Rust
 
-**Use Case Keywords:** gaming clan communication, esports team chat, developer team collaboration, privacy-conscious messaging, GDPR compliant chat, on-premise chat solution, air-gapped communication platform, community chat software, streamer chat platform, remote team communication
+*Gaming:** gaming clan communication, esports team chat, developer team collaboration, privacy-conscious messaging, GDPR compliant chat, on-premise chat solution, air-gapped communication platform, community chat software, streamer chat platform, remote team communication
 
 ---
 
