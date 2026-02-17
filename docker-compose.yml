@@ -1,0 +1,147 @@
+version: "3.8"
+
+services:
+  # Authentication Service
+  auth:
+    build: ./backend/auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # Core Service
+  core:
+    build: ./backend/core-service
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - mongo
+      - redis
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # Frontend
+  frontend:
+    build: ./frontend/web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_AUTH_URL=http://localhost:8081
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8080/ws
+    depends_on:
+      - core
+      - auth
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # MongoDB
+  mongo:
+    image: mongo:6
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # MinIO (S3-compatible storage)
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # Loki
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./monitoring/loki/config.yml:/etc/loki/local-config.yaml
+      - loki_data:/loki
+    restart: unless-stopped
+    networks:
+      - webchat
+
+  # Promtail
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./monitoring/promtail/config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    restart: unless-stopped
+    networks:
+      - webchat
+
+volumes:
+  mongo_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+
+networks:
+  webchat:
+    driver: bridge
