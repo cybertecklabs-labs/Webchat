@@ -9,24 +9,33 @@ use axum::{
 use dotenv::dotenv;
 use mongodb::Client;
 use std::net::SocketAddr;
-use tower_http::cors::{Any, CorsLayer};
+use std::{net::SocketAddr, time::Duration};
+use tower::ServiceBuilder;
+use tower_http::{
+    cors::CorsLayer,
+    limit::RequestBodyLimitLayer,
+    timeout::TimeoutLayer,
+    trace::TraceLayer,
+};
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    let mongo_uri = std::env::var("MONGO_URI").expect("MONGO_URI must be set");
-    let client = Client::with_uri_str(&mongo_uri).await.expect("Failed to connect to MongoDB");
-    let db = client.database("webchat");
 
-    let cors = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
+    let db = db::get_database().await.expect("DB connection failed");
+
+    let cors = CorsLayer::permissive();
 
     let app = Router::new()
         .route("/register", post(handlers::register))
         .route("/login", post(handlers::login))
-        .layer(cors)
+        .layer(
+            ServiceBuilder::new()
+                .layer(TraceLayer::new_for_http())
+                .layer(TimeoutLayer::new(Duration::from_secs(30)))
+                .layer(RequestBodyLimitLayer::new(1024 * 1024)) // 1MB limit
+                .layer(cors),
+        )
         .with_state(db);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8081));

@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-notification-channels
+  namespace: webchat
+data:
+  notification-channels.yml: |
+    notifiers:
+      # Email notifications
+      - name: email-alerts
+        type: email
+        uid: email_notifier
+        org_id: 1
+        is_default: true
+        send_reminder: true
+        frequency: 5m
+        settings:
+          addresses: "alerts@yourdomain.com"
+          singleEmail: false
+
+      # Slack notifications
+      - name: slack-alerts
+        type: slack
+        uid: slack_notifier
+        org_id: 1
+        is_default: false
+        send_reminder: true
+        frequency: 5m
+        settings:
+          url: "${SLACK_WEBHOOK_URL}"
+          recipient: "#webchat-alerts"
+          username: "Grafana"
+          icon_emoji: ":warning:"
+          mentionChannel: "here"
+          
+      # Webhook for custom integrations
+      - name: webhook-alerts
+        type: webhook
+        uid: webhook_notifier
+        org_id: 1
+        is_default: false
+        settings:
+          url: "${WEBHOOK_URL}"
+          httpMethod: "POST"
+          maxAlerts: 10

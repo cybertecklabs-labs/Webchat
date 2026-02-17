@@ -1,0 +1,195 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alerts
+  namespace: webchat
+data:
+  alerts.yml: |
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: WebChat Alerts
+        folder: alerts
+        interval: 1m
+        rules:
+          # High CPU Usage
+          - uid: high_cpu
+            title: High CPU Usage
+            condition: A
+            data:
+              - refId: A
+                queryType: ''
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: 'rate(process_cpu_seconds_total[5m]) > 0.8'
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+            noDataState: NoData
+            execErrState: Alerting
+            for: 5m
+            annotations:
+              description: 'CPU usage is above 80% for 5 minutes'
+              summary: 'High CPU usage detected'
+            labels:
+              severity: warning
+            isPaused: false
+
+          # High Memory Usage
+          - uid: high_memory
+            title: High Memory Usage
+            condition: A
+            data:
+              - refId: A
+                queryType: ''
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: 'process_resident_memory_bytes / 1024 / 1024 > 1024'
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+            noDataState: NoData
+            execErrState: Alerting
+            for: 5m
+            annotations:
+              description: 'Memory usage is above 1GB'
+              summary: 'High memory usage detected'
+            labels:
+              severity: warning
+            isPaused: false
+
+          # Service Down
+          - uid: service_down
+            title: Service Down
+            condition: A
+            data:
+              - refId: A
+                queryType: ''
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: 'up{job=~"core-service|auth-service"} == 0'
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+            noDataState: Alerting
+            execErrState: Alerting
+            for: 2m
+            annotations:
+              description: 'Service {{ $labels.job }} is down'
+              summary: 'Critical: Service unavailable'
+            labels:
+              severity: critical
+            isPaused: false
+
+          # High Error Rate
+          - uid: high_error_rate
+            title: High Error Rate
+            condition: A
+            data:
+              - refId: A
+                queryType: ''
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: 'rate(http_requests_total{status=~"5.."}[5m]) > 10'
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+            noDataState: NoData
+            execErrState: Alerting
+            for: 5m
+            annotations:
+              description: 'Error rate is above 10 requests/second'
+              summary: 'High error rate detected'
+            labels:
+              severity: critical
+            isPaused: false
+
+          # Database Connection Issues
+          - uid: db_connection_issues
+            title: Database Connection Issues
+            condition: A
+            data:
+              - refId: A
+                queryType: ''
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: 'mongodb_connections_current < 1'
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+            noDataState: Alerting
+            execErrState: Alerting
+            for: 2m
+            annotations:
+              description: 'No active MongoDB connections'
+              summary: 'Database connection issue'
+            labels:
+              severity: critical
+            isPaused: false
+
+          # Redis Connection Issues
+          - uid: redis_connection_issues
+            title: Redis Connection Issues
+            condition: A
+            data:
+              - refId: A
+                queryType: ''
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: 'redis_connected_clients < 1'
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+            noDataState: Alerting
+            execErrState: Alerting
+            for: 2m
+            annotations:
+              description: 'No active Redis connections'
+              summary: 'Redis connection issue'
+            labels:
+              severity: critical
+            isPaused: false
+
+          # Disk Space Low
+          - uid: disk_space_low
+            title: Disk Space Low
+            condition: A
+            data:
+              - refId: A
+                queryType: ''
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: '(node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10'
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  refId: A
+            noDataState: NoData
+            execErrState: Alerting
+            for: 5m
+            annotations:
+              description: 'Disk space is below 10%'
+              summary: 'Low disk space warning'
+            labels:
+              severity: warning
+            isPaused: false
