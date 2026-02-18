@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![WebChat Logo](https://img.shields.io/badge/WebChat-Gaming%20Chat-00ff99?style=for-the-badge&logo=rust)
+![WebChat Hero](docs/images/hero.png)
 [![Rust](https://img.shields.io/badge/Rust-1.75+-orange?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
