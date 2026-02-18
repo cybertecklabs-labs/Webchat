@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   keywords: "self-hosted chat, Discord alternative, gaming chat, open source chat, WebSocket chat, Rust chat server",
 };
 
+import { ToastProvider } from "@/components/ToastProvider";
+
 export default function RootLayout({
   children,
 }: {
@@ -16,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={cn("bg-background text-foreground antialiased font-sans")}>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );
